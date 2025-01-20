@@ -44,4 +44,10 @@ export const noteRouter = createTRPCRouter({
 
     return note ?? null;
   }),
+
+  getAll: publicProcedure.query(({ ctx }) => {
+    return ctx.db.query.notes.findMany({
+      orderBy: (notes, { desc }) => [desc(notes.createdAt)],
+    });
+  }),
 });

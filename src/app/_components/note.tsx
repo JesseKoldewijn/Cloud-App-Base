@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import { api } from "~/trpc/react";
 
-export function LatestNote() {
-  const [latestNote] = api.note.getLatest.useSuspenseQuery();
+export const LatestNote = () => {
+  const [allNotes] = api.note.getAll.useSuspenseQuery();
 
   const utils = api.useUtils();
 
@@ -16,13 +16,21 @@ export function LatestNote() {
     onSuccess: async () => {
       await utils.note.invalidate();
       setName("");
+      setContent("");
     },
   });
 
   return (
-    <div className="w-full max-w-xs">
-      {latestNote ? (
-        <p className="truncate">Your most recent post: {latestNote.name}</p>
+    <div className="flex w-full max-w-xs flex-col gap-2 px-2 py-1">
+      {allNotes ? (
+        <div>
+          {allNotes.map((note) => (
+            <div key={note.id} className="border p-1">
+              <p>{note.name}</p>
+              <p>{note.content}</p>
+            </div>
+          ))}
+        </div>
       ) : (
         <p>You have no notes yet.</p>
       )}
@@ -38,19 +46,19 @@ export function LatestNote() {
           placeholder="Title"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-full px-4 py-2 text-black"
+          className="w-full rounded-md px-4 py-2 text-black"
         />
 
         <textarea
           placeholder="Content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="w-full rounded-full px-4 py-2 text-black"
+          className="w-full rounded-md px-4 py-2 text-black"
         />
 
         <button
           type="submit"
-          className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
+          className="rounded-md bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
           disabled={createNote.isPending}
         >
           {createNote.isPending ? "Submitting..." : "Submit"}
@@ -58,4 +66,4 @@ export function LatestNote() {
       </form>
     </div>
   );
-}
+};
