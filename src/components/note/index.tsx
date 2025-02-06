@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 
 import { api } from "~/trpc/react";
 import {
@@ -25,7 +25,14 @@ export const INTERNAL_LatestNote = () => {
       {allNotes ? (
         <div>
           {allNotes.map((note) => (
-            <div key={note.id} className="border p-1">
+            <div
+              key={note.id}
+              className="border p-1"
+              style={{
+                backgroundColor: note.note_color ?? "#000000",
+                color: note.note_color_isDark ? "#ffffff" : "#000000",
+              }}
+            >
               <p>{note.name}</p>
               <p>{note.content}</p>
             </div>
@@ -45,14 +52,24 @@ export const LatestNote = () => (
 );
 
 export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
+  const [noteColor, setNoteColor] = useState("#000000");
 
   const createNote = api.note.create.useMutation({
     onSuccess: async () => {
       await apiUtils?.note.invalidate();
       setName("");
       setContent("");
+      setNoteColor("#000000");
+
+      setTimeout(() => {
+        closeRef.current?.click();
+        formRef.current?.reset();
+      }, 100);
     },
   });
 
@@ -68,9 +85,11 @@ export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
         </DrawerHeader>
         <DrawerFooter>
           <form
+            ref={formRef}
             onSubmit={(e) => {
               e.preventDefault();
-              createNote.mutate({ name, content });
+              createNote.mutate({ name, content, note_color: noteColor });
+              e.currentTarget.reset();
             }}
             className="flex flex-col gap-2"
           >
@@ -80,6 +99,7 @@ export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="bg-background text-foreground w-full rounded-md border px-4 py-2"
+              autoFocus
             />
 
             <textarea
@@ -87,6 +107,14 @@ export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="bg-background text-foreground w-full rounded-md border px-4 py-2"
+            />
+
+            <input
+              type="color"
+              className="block h-10 w-full cursor-pointer rounded-lg border border-gray-200 bg-white p-1 disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-900"
+              value={noteColor}
+              onChange={(e) => setNoteColor(e.target.value)}
+              title="Choose your color"
             />
 
             <button
@@ -98,7 +126,7 @@ export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
             </button>
           </form>
           <Button variant="outline" asChild>
-            <DrawerClose>Cancel</DrawerClose>
+            <DrawerClose ref={closeRef}>Cancel</DrawerClose>
           </Button>
         </DrawerFooter>
       </DrawerContent>

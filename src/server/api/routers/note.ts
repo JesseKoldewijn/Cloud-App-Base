@@ -4,6 +4,8 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { notes, notesConfig } from "~/server/db/schema";
 import { slugify } from "~/utils/slugify";
 
+import { colord } from "colord";
+
 export const noteRouter = createTRPCRouter({
   // Create POST method for inserting posts
   create: publicProcedure
@@ -17,6 +19,7 @@ export const noteRouter = createTRPCRouter({
           .string()
           .min(notesConfig.content.minLength)
           .max(notesConfig.content.maxLength),
+        note_color: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -33,6 +36,8 @@ export const noteRouter = createTRPCRouter({
       await ctx.db.insert(notes).values({
         name: input.name,
         content: input.content,
+        note_color: input.note_color,
+        note_color_isDark: colord(input.note_color ?? "#000000").isDark(),
         slug: slug,
       });
     }),

@@ -4,6 +4,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  boolean,
   index,
   mysqlTableCreator,
   timestamp,
@@ -38,6 +39,8 @@ export const notes = createTable(
     name: varchar("name", { length: notesConfig.name.maxLength }),
     slug: varchar("slug", { length: 256 }).unique().notNull(),
     content: varchar("content", { length: notesConfig.content.maxLength }),
+    note_color: varchar("note_color", { length: 256 }).default("none"),
+    note_color_isDark: boolean("note_color_is_dark"),
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
