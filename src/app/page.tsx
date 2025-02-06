@@ -1,14 +1,17 @@
-import { api, HydrateClient } from "~/trpc/server";
-import { LatestNote } from "./_components/note";
+import { HydrateClient } from "~/trpc/server";
+
+import {
+  Dynamic_CreateNote,
+  Dynamic_LatestNote,
+} from "~/components/note/dynamic";
 
 const Home = async () => {
-  void api.note.getLatest.prefetch();
-
   return (
     <HydrateClient>
       <div className="flex flex-col items-center gap-5">
         <h1>HomePage</h1>
-        <LatestNote />
+        <Dynamic_CreateNote />
+        <Dynamic_LatestNote />
       </div>
     </HydrateClient>
   );
