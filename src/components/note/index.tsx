@@ -79,14 +79,14 @@ export const INTERNAL_CreateNote = ({ apiUtils }: { apiUtils?: ApiUtils }) => {
               placeholder="Title"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md px-4 py-2 text-black"
+              className="bg-background text-foreground w-full rounded-md border px-4 py-2"
             />
 
             <textarea
               placeholder="Content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full rounded-md px-4 py-2 text-black"
+              className="bg-background text-foreground w-full rounded-md border px-4 py-2"
             />
 
             <button
